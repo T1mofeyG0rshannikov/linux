@@ -42,6 +42,54 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
+## Примеры файлов для systemd сервисов
+
+### up_uvicorn.sh
+
+```
+#!/bin/bash
+source /home/project/env/bin/activate
+cd /home/project/src
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+```
+
+### up_gunicorn.sh
+
+```
+#!/bin/bash
+source /home/project/env/bin/activate
+cd /home/project/src
+exec gunicorn --bind 0.0.0.0:8000 core.wsgi:application
+```
+
+### up_celery.sh
+
+```
+#!/bin/bash
+source /home/project/env/bin/activate
+cd /home/project/src
+exec celery -A app.tasks worker -l INFO --pool=solo
+```
+
+### up_celery_beat.sh
+
+```
+#!/bin/bash
+source /home/project/env/bin/activate
+cd /home/project/src
+exec celery -A app.tasks beat -l INFO
+```
+
+## Установка Reboot скрипта
+
+```
+cd /etc
+```
+в файле crontab в конце добавляем
+```
+@reboot root sh /home/up_server.sh
+```
+
 ### Общие команды
 ```bash
 chmod -R 755 /home/project_name/
