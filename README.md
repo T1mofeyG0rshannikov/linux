@@ -23,6 +23,18 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
+## 📦 Установка PostgreSql
+
+```bash
+sudo apt update
+sudo apt install postgresql postgresql-contrib
+sudo systemctl start postgresql.service
+sudo systemctl status postgresql.service
+
+sudo -i -u postgres
+psql
+```
+
 ---
 
 ## ⚙️ Настройка systemd сервисов
