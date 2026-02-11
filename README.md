@@ -129,9 +129,35 @@ sudo apt update
 sudo apt install certbot python3-certbot-nginx
 ```
 
-Выпуск сертификата для домена:
+## Базовый nginx.conf
+
+mydomain.com.conf
+```
+server {
+    server_name mydomain.com www.mydomain.com;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+### Перезапуск nginx
 ```bash
-sudo certbot --nginx -d zagran.anketus.ru
+sudo systemctl restart nginx
+```
+
+### Выпуск сертификата для домена:
+```bash
+sudo certbot --nginx -d mydomain.com
 ```
 
 ---
