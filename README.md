@@ -169,4 +169,8 @@ sudo certbot --nginx -d mydomain.com
 sudo certbot renew --dry-run
 ```
 
+Дамп данных Django:
+```bash
+python manage.py dumpdata app.Model --natural-foreign --natural-primary -o dump.json
+```
 ---
