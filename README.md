@@ -174,3 +174,77 @@ sudo certbot renew --dry-run
 python manage.py dumpdata app.Model --natural-foreign --natural-primary -o dump.json
 ```
 ---
+
+## 📦 Установка и развертывание React на Linux
+
+React-приложение на Vite собирается в каталог `dist`, который сервис раздает через `serve`. 
+
+### Установка Node.js и npm
+
+Для начала установите npm из репозитория системы:
+
+```bash
+sudo apt update
+sudo apt install npm
+```
+
+### Создание проекта и скачивание пакетов
+
+
+```bash
+cd /home/project_name/frontend
+npm install
+```
+
+```bash
+npm install --save-exact serve
+npm run build
+```
+
+### Сервис systemd
+
+Добавьте команду `start` в существующий раздел `scripts` файла `package.json`, сохранив остальные команды:
+
+```json
+"start": "serve -s dist -l tcp://127.0.0.1:3000"
+```
+
+Для этого варианта пакет `serve` и сборка `dist` должны быть подготовлены командами выше. В `/etc/systemd/system/react.service` используйте следующую секцию `[Service]` вместо предыдущей; секции `[Unit]` и `[Install]` оставьте как в примере выше:
+
+```ini
+[Service]
+WorkingDirectory=/home/project_name/frontend
+Environment=PATH=/usr/bin:/bin
+ExecStart=/usr/bin/npm start
+Restart=on-failure
+RestartSec=5
+```
+
+Проверьте путь к npm командой `command -v npm`. Пример рассчитан на системную установку Node.js из раздела выше. Скрипт `up_react.sh` для этого варианта не нужен.
+
+После изменения сервиса примените настройки:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable react.service
+sudo systemctl restart react.service
+sudo systemctl status react.service
+```
+
+### Доступ через Nginx и обновление
+
+Для доступа по домену установите Nginx:
+
+```
+server {
+    # Django
+    location ~ ^/(api/|_allauth/|accounts/(yandex|vk)/|panel/admin/) {
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+    # React
+    location / {
+        proxy_pass http://127.0.0.1:3000;
+    }
+}
+```
